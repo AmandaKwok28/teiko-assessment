@@ -1,13 +1,14 @@
 import sqlite3
 import csv
-from pathlib import Path
-
 
 def initialize_database(conn):
     cursor = conn.cursor()
 
+    cursor.execute("DROP TABLE IF EXISTS cell_counts")
+    cursor.execute("DROP TABLE IF EXISTS samples")
+
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS samples (
+    CREATE TABLE samples (
         sample TEXT PRIMARY KEY,
         project TEXT,
         subject TEXT,
@@ -22,7 +23,7 @@ def initialize_database(conn):
     """)
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS cell_counts (
+    CREATE TABLE cell_counts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         sample_id TEXT,
         cell_type TEXT,
@@ -30,15 +31,14 @@ def initialize_database(conn):
         FOREIGN KEY(sample_id) REFERENCES samples(sample)
     )
     """)
-    
-    # adding indexes for faster queries
+
     cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_sample_id
+        CREATE INDEX idx_sample_id
         ON cell_counts(sample_id)
     """)
 
     cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_cell_type
+        CREATE INDEX idx_cell_type
         ON cell_counts(cell_type)
     """)
 
